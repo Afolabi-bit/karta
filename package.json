@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^7.5.14",
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-neon": "^7.8.0",
     "@reduxjs/toolkit": "^2.12.0",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.23.0",
@@ -20,7 +22,8 @@
     "react-hot-toast": "^2.6.0",
     "react-redux": "^9.3.0",
     "recharts": "^3.9.2",
-    "sonner": "^2.0.7"
+    "sonner": "^2.0.7",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

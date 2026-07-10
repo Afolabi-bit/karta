@@ -9,8 +9,8 @@ const globalForPrisma = globalThis as unknown as {
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaNeon({ connectionString });
 
-export const db = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = db;
+  globalForPrisma.prisma = prisma;
 }

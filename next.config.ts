@@ -1,9 +1,10 @@
 const nextConfig = {
-  webpack: (config: any) => {
-    config.resolve.extensionAlias = {
-      ".js": [".ts", ".js"],
-    };
-    return config;
+  turbopack: {
+    resolveAlias: {
+      "./enums.js": "./enums.ts",
+      "./internal/class.js": "./internal/class.ts",
+      "./internal/prismaNamespace.js": "./internal/prismaNamespace.ts",
+    },
   },
 };
 export default nextConfig;

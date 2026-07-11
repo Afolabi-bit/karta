@@ -9,13 +9,13 @@ export const syncUserCreation = inngest.createFunction(
     triggers: [{ event: "clerk/user.created" }],
   },
   async ({ event }) => {
-    const user = event.data.data;
+    const user = event.data;
 
     await prisma.user.create({
       data: {
         id: user.id,
-        email: user.email_addresses[0].email_address,
-        name: (user.first_name ?? "") + " " + (user.last_name ?? ""),
+        email: user.email_addresses?.[0]?.email_address ?? "",
+        name: ((user.first_name ?? "") + " " + (user.last_name ?? "")).trim(),
         image: user.image_url ?? "",
       },
     });
@@ -29,14 +29,14 @@ export const syncUserUpdate = inngest.createFunction(
     triggers: [{ event: "clerk/user.updated" }],
   },
   async ({ event }) => {
-    const user = event.data.data;
+    const user = event.data;
 
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        name: (user.first_name ?? "") + " " + (user.last_name ?? ""),
+        name: ((user.first_name ?? "") + " " + (user.last_name ?? "")).trim(),
         image: user.image_url ?? "",
-        email: user.email_addresses[0].email_address,
+        email: user.email_addresses?.[0]?.email_address ?? "",
       },
     });
   },
@@ -49,10 +49,11 @@ export const syncUserDeletion = inngest.createFunction(
     triggers: [{ event: "clerk/user.deleted" }],
   },
   async ({ event }) => {
-    const user = event.data.data;
+    const user = event.data;
 
     await prisma.user.delete({
       where: { id: user.id },
     });
   },
 );
+

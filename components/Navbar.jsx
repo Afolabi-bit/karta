@@ -1,5 +1,4 @@
 "use client";
-import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import { PackageIcon, Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -65,51 +64,26 @@ const Navbar = () => {
               </button>
             </Link>
 
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button className="px-8 py-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full">
-                  Login
-                </button>
-              </SignInButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton>
-                <UserButton.MenuItems>
-                  <UserButton.Action
-                    labelIcon={<PackageIcon size={16} />}
-                    label="My Orders"
-                    onClick={() => router.push("/orders")}
-                  />
-                </UserButton.MenuItems>
-              </UserButton>
-            </Show>
+            <Link
+              href="/orders"
+              className="flex items-center gap-2 text-slate-600"
+            >
+              <PackageIcon size={18} />
+              My Orders
+            </Link>
           </div>
 
-          {/* Mobile User Button  */}
-          <div className="sm:hidden">
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button className="px-7 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-sm transition text-white rounded-full">
-                  Login
-                </button>
-              </SignInButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton>
-                <UserButton.MenuItems>
-                  <UserButton.Action
-                    labelIcon={<ShoppingCart size={16} />}
-                    label="Cart"
-                    onClick={() => router.push("/cart")}
-                  />
-                  <UserButton.Action
-                    labelIcon={<PackageIcon size={16} />}
-                    label="My Orders"
-                    onClick={() => router.push("/orders")}
-                  />
-                </UserButton.MenuItems>
-              </UserButton>
-            </Show>
+          {/* Mobile Menu */}
+          <div className="sm:hidden flex items-center gap-4">
+            <Link href="/cart" className="relative">
+              <ShoppingCart size={18} />
+              <span className="absolute -top-1 left-3 text-[8px] text-white bg-slate-600 size-3.5 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            </Link>
+            <Link href="/orders">
+              <PackageIcon size={18} />
+            </Link>
           </div>
         </div>
       </div>

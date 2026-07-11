@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import imagekit from "@/config/imagekit";
+import { toFile } from "@imagekit/nodejs";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 const USERNAME_REGEX = /^[A-Za-z0-9_\-$#@&]+$/;
@@ -97,17 +98,18 @@ export async function POST(req) {
 
     let imageData;
     try {
+      const fileObject = await toFile(buffer, image.name);
       imageData = await imagekit.files.upload({
-        file: buffer,
+        file: fileObject,
         fileName: image.name,
         folder: "stores",
       });
-      const url = imagekit.url({
-        path: result.filePath,
+
+      const url = imagekit.helper.buildSrc({
+        urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+        src: imageData.filePath,
         transformation: [
-          { width: 1024 },
-          { quality: "auto" },
-          { format: "webp" },
+          { width: 1024, quality: "auto", format: "webp" },
         ],
       });
       if (!url) {

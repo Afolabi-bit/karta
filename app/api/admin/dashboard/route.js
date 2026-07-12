@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import authAdmin from "../../../../middlewares/authAdmin";
-import prisma from "../../../../lib/prisma";
+import prisma from "@/lib/db";
 
 // Get admin dashboard data
 export async function GET(request) {
@@ -46,7 +46,7 @@ export async function GET(request) {
       allOrders,
     };
 
-    return NextResponse.json(dashboardData);
+    return NextResponse.json({ success: true, dashboardData });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

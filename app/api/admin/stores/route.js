@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import authAdmin from "../../../../middlewares/authAdmin";
-import prisma from "../../../../lib/prisma";
+import prisma from "@/lib/db";
 
 // get all approved stores
 export async function GET(request) {

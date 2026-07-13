@@ -22,6 +22,8 @@ export const syncUserCreation = inngest.createFunction(
   },
 );
 
+// Inngest fn to update user data in DB
+
 export const syncUserUpdate = inngest.createFunction(
   {
     id: "sync-user-update",
@@ -42,6 +44,7 @@ export const syncUserUpdate = inngest.createFunction(
   },
 );
 
+// Inngest fn to delete user data from DB
 export const syncUserDeletion = inngest.createFunction(
   {
     id: "sync-user-delete",
@@ -54,5 +57,29 @@ export const syncUserDeletion = inngest.createFunction(
     await prisma.user.delete({
       where: { id: user.id },
     });
+  },
+);
+
+// Inngest fn to delete coupon from DB
+
+export const deleteCouponOnExpiry = inngest.createFunction(
+  {
+    id: "delete-coupon-on-expiry",
+    name: "Delete Coupon On Expiry",
+    triggers: [{ event: "app/coupon.expired" }],
+  },
+  async ({ event, step }) => {
+    const { data } = event;
+
+    const expiryDate = new Date(data.expires_at);
+
+    await step.sleepUntil("wait-for-expiry", expiryDate);
+    await step.run("delete-coupon-from-database", async () => {
+      await prisma.coupon.delete({
+        where: { code: data.code },
+      });
+    });
+
+    return { success: true };
   },
 );

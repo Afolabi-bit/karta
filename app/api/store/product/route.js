@@ -44,9 +44,7 @@ export async function POST(request) {
         const url = imagekit.helper.buildSrc({
           urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
           src: result.filePath,
-          transformation: [
-            { width: 1024, quality: "auto", format: "webp" },
-          ],
+          transformation: [{ width: 1024, quality: "auto", format: "webp" }],
         });
         return url;
       }),
@@ -92,7 +90,7 @@ export async function GET(request) {
       where: { storeId },
     });
 
-    return NextResponse.json(products, { status: 200 });
+    return NextResponse.json({ products }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

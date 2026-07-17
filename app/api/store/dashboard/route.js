@@ -35,15 +35,14 @@ export async function GET(request) {
     });
 
     const dashboardData = {
-      totalOrders: orders.length,
-      totalProducts: products.length,
+      totalOrders: orders?.length || 0,
+      totalProducts: products?.length || 0,
       ratings,
-      totalEarnings: Math.round(
-        orders?.reduce((acc, order) => acc + order.totalAmount, 0),
-      ),
+      totalEarnings:
+        orders?.reduce((acc, order) => acc + order?.total, 0) || 0,
     };
 
-    return NextResponse.json(dashboardData, { status: 200 });
+    return NextResponse.json({ success: true, dashboardData }, { status: 200 });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

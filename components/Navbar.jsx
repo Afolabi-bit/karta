@@ -1,5 +1,5 @@
 "use client";
-import { SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { SignInButton, Show, UserButton, useUser } from "@clerk/nextjs";
 import { PackageIcon, Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const router = useRouter();
+  const { user } = useUser();
 
   const [search, setSearch] = useState("");
   const cartCount = useSelector((state) => state.cart.total);
@@ -27,9 +28,11 @@ const Navbar = () => {
           >
             <span className="text-green-600">go</span>cart
             <span className="text-green-600 text-5xl leading-0">.</span>
-            <p className="absolute text-xs font-semibold -top-1 -right-8 px-3 p-0.5 rounded-full flex items-center gap-2 text-white bg-green-500">
-              plus
-            </p>
+            {user?.publicMetadata?.plus && (
+              <p className="absolute text-xs font-semibold -top-1 -right-8 px-3 p-0.5 rounded-full flex items-center gap-2 text-white bg-green-500">
+                plus
+              </p>
+            )}
           </Link>
 
           {/* Desktop Menu */}

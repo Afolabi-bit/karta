@@ -4,10 +4,11 @@ import AddressModal from "./AddressModal";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 
 const OrderSummary = ({ totalPrice, items }) => {
-  const { user } = useUser();
+  const { isLoaded, has } = useAuth();
+  const isPlus = isLoaded && has && has({ plan: "plus" });
 
   const currency = process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || "$";
 
@@ -113,7 +114,7 @@ const OrderSummary = ({ totalPrice, items }) => {
               {currency}
               {totalPrice.toLocaleString()}
             </p>
-            <p>{user?.publicMetadata?.plus ? "Free" : `${currency}5`}</p>
+            <p>{isPlus ? "Free" : `${currency}5`}</p>
             {coupon && (
               <p>{`-${currency}${((coupon.discount / 100) * totalPrice).toFixed(2)}`}</p>
             )}
@@ -161,7 +162,7 @@ const OrderSummary = ({ totalPrice, items }) => {
         <p className="font-medium text-right">
           {currency}
           {coupon
-            ? user?.publicMetadata?.plus
+            ? isPlus
               ? (
                   totalPrice -
                   (coupon.discount / 100) * totalPrice
@@ -171,7 +172,7 @@ const OrderSummary = ({ totalPrice, items }) => {
                   (coupon.discount / 100) * totalPrice +
                   5
                 ).toLocaleString()
-            : user?.publicMetadata?.plus
+            : isPlus
               ? totalPrice.toLocaleString()
               : (totalPrice + 5).toLocaleString()}
         </p>

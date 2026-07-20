@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Loading from "@/components/Loading";
-import { orderDummyData } from "@/assets/assets";
 import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -17,7 +16,7 @@ export default function StoreOrders() {
   const fetchOrders = async () => {
     try {
       const token = await getToken();
-      const { data } = await axios.get("/api/store/orders", {
+      const { data } = await axios.get("/api/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(data.orders);
@@ -32,8 +31,8 @@ export default function StoreOrders() {
   const updateOrderStatus = async (orderId, status) => {
     try {
       const token = await getToken();
-      const { data } = await axios.put(
-        "/api/store/orders",
+      await axios.post(
+        "/api/orders",
         {
           orderId,
           status,
@@ -64,6 +63,7 @@ export default function StoreOrders() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
     fetchOrders();
   }, []);
 

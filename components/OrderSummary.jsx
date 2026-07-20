@@ -6,10 +6,13 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 
 const OrderSummary = ({ totalPrice, items }) => {
   const { isLoaded, has } = useAuth();
   const isPlus = isLoaded && has && has({ plan: "plus" });
+
+  const dispatch = useDispatch();
 
   const { user } = useUser();
 
@@ -57,7 +60,42 @@ const OrderSummary = ({ totalPrice, items }) => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
 
-    router.push("/orders");
+    try {
+      if (!user) return toast.error("Please login to place an order");
+      if (!selectedAddress) return toast.error("Please select an address");
+      if (!paymentMethod) return toast.error("Please select a payment method");
+      if (!items) return toast.error("No items to order");
+
+      const token = await getToken();
+
+      const orderData = {
+        addressId: selectedAddress.id,
+        items,
+        paymentMethod,
+      };
+
+      if (coupon) {
+        orderData.couponCode = coupon.code;
+      }
+
+      const { data } = await axios.post("/api/order", orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (paymentMethod === "STRIPE") {
+        window.location.href = data.session.url;
+      } else {
+        toast.success(data.message);
+        router.push("/orders");
+        dispatch(fetchCart({ getToken }));
+      }
+    } catch (error) {
+      toast.error(
+        error.response.data.error || error.message || "Failed to place order",
+      );
+    }
   };
 
   return (

@@ -12,7 +12,7 @@ export async function POST(request) {
 
     const { code } = await request.json();
 
-    const coupon = await prisma.coupon.findUnique({
+    const coupon = await prisma.coupon.findFirst({
       where: {
         code: code.toUpperCase(),
         expiresAt: {

@@ -5,7 +5,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const username = searchParams.get("username").toLowerCase();
+    const username = searchParams.get("username");
 
     if (!username)
       return NextResponse.json(
@@ -13,8 +13,14 @@ export async function GET(request) {
         { status: 400 },
       );
 
-    const store = await prisma.store.findUnique({
-      where: { username, isActive: true },
+    const store = await prisma.store.findFirst({
+      where: {
+        username: {
+          equals: username,
+          mode: "insensitive",
+        },
+        isActive: true,
+      },
       include: {
         Product: {
           include: { rating: true },

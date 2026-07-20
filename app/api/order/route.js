@@ -3,7 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
-import { PaymentMethod } from "@/prisma/generated/client";
+import { PaymentMethod } from "@prisma/client";
 
 export async function POST(request) {
   try {

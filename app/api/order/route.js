@@ -104,7 +104,7 @@ export async function POST(request) {
     }
 
     //  create a new order for each store
-    let orderIds = [];
+    let orderId = [];
     let fullAmount = 0;
 
     let isShippingFeeAdded = false;
@@ -117,13 +117,13 @@ export async function POST(request) {
         0,
       );
 
-      if (couponCode && coupon) {
+      if (couponCode) {
         total -= (total * coupon.discount) / 100;
-      }
 
-      if (!isPlusMember && !isShippingFeeAdded) {
-        total += 5;
-        isShippingFeeAdded = true;
+        if (!isPlusMember && !isShippingFeeAdded) {
+          total += 599;
+          isShippingFeeAdded = true;
+        }
       }
 
       fullAmount += parseFloat(total.toFixed(2));
@@ -147,18 +147,8 @@ export async function POST(request) {
           },
         },
       });
-      orderIds.push(order.id);
+      orderId.push(order.id);
     }
-
-    // clear the cart for the user
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        cart: {},
-      },
-    });
 
     if (paymentMethod === "STRIPE") {
       const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -179,12 +169,12 @@ export async function POST(request) {
             quantity: 1,
           },
         ],
-        expires_at: Math.floor(Date.now() / 1000) + 35 * 60,
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
         mode: "payment",
         success_url: `${origin}/loading?nextUrl=orders`,
         cancel_url: `${origin}/cart`,
         metadata: {
-          orderIds: orderIds.join(","),
+          orderIds: orderId.join(","),
           userId,
           appId: "gocart",
         },
@@ -193,10 +183,20 @@ export async function POST(request) {
       return NextResponse.json({ session });
     }
 
+    // clear the cart
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        cart: {},
+      },
+    });
+
     return NextResponse.json(
       {
         message: "Order placed successfully",
-        orderId: orderIds,
+        orderId: orderId,
       },
       { status: 201 },
     );

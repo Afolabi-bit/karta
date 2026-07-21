@@ -28,6 +28,7 @@
     "react-redux": "^9.3.0",
     "recharts": "^3.9.2",
     "sonner": "^2.0.7",
+    "stripe": "^22.3.2",
     "ws": "^8.21.0"
   },
   "devDependencies": {

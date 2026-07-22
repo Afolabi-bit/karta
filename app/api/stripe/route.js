@@ -94,13 +94,7 @@ export async function POST(request) {
     console.error("Error processing Stripe webhook:", error);
     return NextResponse.json(
       { error: error.message || "Webhook handler error" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};

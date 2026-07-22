@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import prisma from "@/lib/db";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(request) {
-  const { userId } = auth();
+  const { userId } = await auth();
   try {
     const rawBody = await request.text();
     const signature = request.headers.get("stripe-signature");
@@ -94,7 +94,7 @@ export async function POST(request) {
     console.error("Error processing Stripe webhook:", error);
     return NextResponse.json(
       { error: error.message || "Webhook handler error" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

@@ -10,10 +10,7 @@ const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaNeon({ connectionString });
 
 export const prisma =
-  globalForPrisma.prisma ??
-  (process.env.NEXT_RUNTIME === "edge"
-    ? new PrismaClient({ adapter })
-    : new PrismaClient());
+  globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production" && process.env.NEXT_RUNTIME !== "edge") {
   globalForPrisma.prisma = prisma;

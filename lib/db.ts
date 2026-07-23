@@ -9,9 +9,13 @@ const globalForPrisma = globalThis as unknown as {
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaNeon({ connectionString });
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+export const prisma =
+  globalForPrisma.prisma ??
+  (process.env.NEXT_RUNTIME === "edge"
+    ? new PrismaClient({ adapter })
+    : new PrismaClient());
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" && process.env.NEXT_RUNTIME !== "edge") {
   globalForPrisma.prisma = prisma;
 }
 

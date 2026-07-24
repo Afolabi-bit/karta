@@ -60,3 +60,55 @@ export async function POST(request) {
     );
   }
 }
+
+export async function GET(request) {
+  try {
+    const { userId } = await auth();
+
+    // Check if there is an active coupon for new users
+    const activeNewUserCoupon = await prisma.coupon.findFirst({
+      where: {
+        forNewUser: true,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (
+      !activeNewUserCoupon ||
+      typeof activeNewUserCoupon.code !== "string" ||
+      activeNewUserCoupon.code.trim().length === 0
+    ) {
+      return NextResponse.json({ showBanner: false, coupon: null });
+    }
+
+    // If user is logged in, check if user has existing orders
+    if (userId) {
+      const orderCount = await prisma.order.count({
+        where: {
+          userId,
+        },
+      });
+
+      if (orderCount > 0) {
+        return NextResponse.json({ showBanner: false, coupon: null });
+      }
+    }
+
+    return NextResponse.json({
+      showBanner: true,
+      coupon: activeNewUserCoupon,
+    });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { showBanner: false, coupon: null },
+      { status: 500 },
+    );
+  }
+}
+

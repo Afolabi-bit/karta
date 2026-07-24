@@ -15,7 +15,7 @@ export default function Banner() {
     return Boolean(
       couponObj &&
       typeof couponObj.code === "string" &&
-      couponObj.code.trim().length > 0
+      couponObj.code.trim().length > 0,
     );
   };
 
@@ -60,9 +60,9 @@ export default function Banner() {
 
   return (
     isOpen && (
-      <div className="w-full px-6 py-1 font-medium text-sm text-white text-center bg-linear-to-r from-violet-500 via-[#9938CA] to-[#E0724A]">
-        <div className="flex items-center justify-between max-w-7xl  mx-auto">
-          <p>
+      <div className="w-full px-6 py-2 font-medium text-sm text-white text-center bg-linear-to-r from-[#840032] via-[#002642] to-[#E59500] shadow-sm">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <p className="font-semibold tracking-wide">
             {coupon
               ? `Get ${coupon.discount}% OFF on Your First Order! Use code: ${coupon.code}`
               : "Get 20% OFF on Your First Order!"}
@@ -71,14 +71,14 @@ export default function Banner() {
             <button
               onClick={handleClaim}
               type="button"
-              className="font-normal text-gray-800 bg-white px-7 py-2 rounded-full max-sm:hidden"
+              className="font-semibold text-white bg-[#E59500] hover:bg-[#CC8400] px-6 py-1.5 rounded-full transition shadow-sm max-sm:hidden"
             >
               Claim Offer
             </button>
             <button
               onClick={() => setIsOpen(false)}
               type="button"
-              className="font-normal text-gray-800 py-2 rounded-full"
+              className="font-normal text-white hover:opacity-80 py-1 rounded-full"
             >
               <svg
                 width="14"

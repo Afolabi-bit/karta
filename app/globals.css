@@ -1,5 +1,72 @@
 @import "tailwindcss";
 
+:root {
+  /* Light Mode Palette */
+  --bg-primary: #F8F9FA;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #E5DADA;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F1F3F5;
+
+  --text-primary: #02040F;
+  --text-secondary: #4A5568;
+  --text-muted: #718096;
+  --text-inverse: #FFFFFF;
+
+  --brand-primary: #E59500;
+  --brand-primary-hover: #CC8400;
+  --brand-secondary: #840032;
+  --brand-accent: #002642;
+
+  --border-color: #E2E8F0;
+  --border-hover: #CBD5E0;
+
+  --shadow-sm: 0 1px 3px rgba(2, 4, 15, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(2, 4, 15, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(2, 4, 15, 0.12);
+
+  --status-success: #10B981;
+  --status-warning: #E59500;
+  --status-error: #EF4444;
+}
+
+[data-theme="dark"],
+.dark {
+  /* Dark Mode Palette */
+  --bg-primary: #02040F;
+  --bg-secondary: #002642;
+  --bg-tertiary: #0A3254;
+  --bg-card: #041B2D;
+  --bg-card-hover: #07253D;
+
+  --text-primary: #F8F9FA;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-inverse: #02040F;
+
+  --brand-primary: #E59500;
+  --brand-primary-hover: #FFB020;
+  --brand-secondary: #A30D45;
+  --brand-accent: #38BDF8;
+
+  --border-color: #0E3A5D;
+  --border-hover: #1A4D78;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+  --status-success: #34D399;
+  --status-warning: #F59E0B;
+  --status-error: #F87171;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 @layer components {
     @keyframes marqueeScroll {
         0% {

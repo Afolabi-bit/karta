@@ -176,7 +176,7 @@ export async function POST(request) {
         metadata: {
           orderIds: orderId.join(","),
           userId,
-          appId: "gocart",
+          appId: "karta",
         },
       });
 

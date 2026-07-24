@@ -60,7 +60,7 @@ export default function Banner() {
 
   return (
     isOpen && (
-      <div className="w-full px-6 py-2 font-medium text-sm text-white text-center bg-linear-to-r from-[#840032] via-[#002642] to-[#E59500] shadow-sm">
+      <div className="w-full px-6 py-2 font-medium text-sm text-white text-center bg-[#002642] shadow-sm">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <p className="font-semibold tracking-wide">
             {coupon

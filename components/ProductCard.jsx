@@ -29,7 +29,7 @@ const ProductCard = ({ product }) => {
                     <p className='font-medium line-clamp-1'>{product.name}</p>
                     <div className='flex'>
                         {Array(5).fill('').map((_, index) => (
-                            <StarIcon key={index} size={14} className='text-transparent mt-0.5' fill={rating >= index + 1 ? "#00C950" : "#D1D5DB"} />
+                            <StarIcon key={index} size={14} className='text-transparent mt-0.5' fill={rating >= index + 1 ? "#E59500" : "#D1D5DB"} />
                         ))}
                     </div>
                 </div>

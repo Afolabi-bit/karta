@@ -86,7 +86,7 @@ export default function AdminApprove() {
                       { loading: "approving" },
                     )
                   }
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  className="px-4 py-2 bg-[#E59500] text-white rounded hover:bg-[#CC8400] text-sm transition"
                 >
                   Approve
                 </button>

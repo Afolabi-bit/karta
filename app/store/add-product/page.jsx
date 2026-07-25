@@ -24,8 +24,8 @@ export default function StoreAddProduct() {
   const [productInfo, setProductInfo] = useState({
     name: "",
     description: "",
-    mrp: 0,
-    price: 0,
+    mrp: "",
+    price: "",
     category: "",
   });
   const [loading, setLoading] = useState(false);
@@ -138,9 +138,43 @@ export default function StoreAddProduct() {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    // Frontend validation
     if (!images[1] && !images[2] && !images[3] && !images[4]) {
-      toast.error("Please upload at least one product image");
-      return;
+      return toast.error("Please upload at least one product image");
+    }
+
+    if (!productInfo.name.trim()) {
+      return toast.error("Please enter a product name");
+    }
+
+    if (!productInfo.description.trim()) {
+      return toast.error("Please enter a product description");
+    }
+
+    const numericMrp = Number(productInfo.mrp);
+    if (!productInfo.mrp || isNaN(numericMrp) || numericMrp <= 0) {
+      return toast.error("Please enter a valid actual price greater than 0");
+    }
+
+    let numericPrice = numericMrp;
+    if (
+      productInfo.price !== "" &&
+      productInfo.price !== null &&
+      productInfo.price !== undefined
+    ) {
+      const parsedPrice = Number(productInfo.price);
+      if (isNaN(parsedPrice) || parsedPrice <= 0) {
+        return toast.error("Please enter a valid offer price");
+      }
+      if (parsedPrice > numericMrp) {
+        return toast.error("Offer price cannot be greater than actual price");
+      }
+      numericPrice = parsedPrice;
+    }
+
+    if (!productInfo.category) {
+      return toast.error("Please select a category");
     }
 
     setLoading(true);
@@ -149,10 +183,10 @@ export default function StoreAddProduct() {
       await toast.promise(
         (async () => {
           const formData = new FormData();
-          formData.append("name", productInfo.name);
-          formData.append("description", productInfo.description);
-          formData.append("mrp", productInfo.mrp);
-          formData.append("price", productInfo.price);
+          formData.append("name", productInfo.name.trim());
+          formData.append("description", productInfo.description.trim());
+          formData.append("mrp", numericMrp);
+          formData.append("price", numericPrice);
           formData.append("category", productInfo.category);
 
           Object.keys(images).forEach((key) => {
@@ -170,8 +204,8 @@ export default function StoreAddProduct() {
           setProductInfo({
             name: "",
             description: "",
-            mrp: 0,
-            price: 0,
+            mrp: "",
+            price: "",
             category: "",
           });
           setImages({ 1: null, 2: null, 3: null, 4: null });
@@ -263,12 +297,13 @@ export default function StoreAddProduct() {
           Actual Price ($)
           <input
             type="number"
+            step="0.01"
+            min="0.01"
             name="mrp"
             onChange={onChangeHandler}
             value={productInfo.mrp}
             placeholder="0"
-            rows={5}
-            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded resize-none"
+            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded"
             required
           />
         </label>
@@ -276,13 +311,13 @@ export default function StoreAddProduct() {
           Offer Price ($)
           <input
             type="number"
+            step="0.01"
+            min="0"
             name="price"
             onChange={onChangeHandler}
             value={productInfo.price}
-            placeholder="0"
-            rows={5}
-            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded resize-none"
-            required
+            placeholder="0 (optional)"
+            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded"
           />
         </label>
       </div>

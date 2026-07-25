@@ -146,7 +146,7 @@ export default function Dashboard() {
                         size={17}
                         className="text-transparent mt-0.5"
                         fill={
-                          review.rating >= index + 1 ? "#00C950" : "#D1D5DB"
+                          review.rating >= index + 1 ? "#E59500" : "#D1D5DB"
                         }
                       />
                     ))}

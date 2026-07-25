@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import { clearCart } from "@/lib/features/cart/cartSlice";
 
 const OrderSummary = ({ totalPrice, items }) => {
   const { isLoaded, has } = useAuth();
@@ -61,10 +62,10 @@ const OrderSummary = ({ totalPrice, items }) => {
     e.preventDefault();
 
     try {
-      if (!user) return toast.error("Please login to place an order");
-      if (!selectedAddress) return toast.error("Please select an address");
-      if (!paymentMethod) return toast.error("Please select a payment method");
-      if (!items) return toast.error("No items to order");
+      if (!user) throw new Error("Please login to place an order");
+      if (!selectedAddress) throw new Error("Please select an address");
+      if (!paymentMethod) throw new Error("Please select a payment method");
+      if (!items || items.length === 0) throw new Error("No items to order");
 
       const token = await getToken();
 
@@ -85,21 +86,23 @@ const OrderSummary = ({ totalPrice, items }) => {
       });
 
       if (paymentMethod === "STRIPE") {
+        dispatch(clearCart());
         window.location.href = data.session.url;
       } else {
         toast.success(data.message);
         router.push("/orders");
-        dispatch(fetchCart({ getToken }));
+        dispatch(clearCart());
       }
     } catch (error) {
       toast.error(
-        error.response.data.error || error.message || "Failed to place order",
+        error?.response?.data?.error || error.message || "Failed to place order",
       );
+      throw error;
     }
   };
 
   return (
-    <div className="w-full max-w-lg lg:max-w-[340px] bg-slate-50/30 border border-slate-200 text-slate-500 text-sm rounded-xl p-7">
+    <div className="w-full max-w-lg lg:max-w-85 bg-slate-50/30 border border-slate-200 text-slate-500 text-sm rounded-xl p-7">
       <h2 className="text-xl font-medium text-slate-600">Payment Summary</h2>
       <p className="text-slate-400 text-xs my-4">Payment Method</p>
       <div className="flex gap-2 items-center">

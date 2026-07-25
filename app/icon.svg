@@ -1,0 +1,31 @@
+<svg
+  viewBox="0 0 100 100"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient id="kartaBgFavicon" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#002642" />
+      <stop offset="1" stop-color="#02040F" />
+    </linearGradient>
+    <linearGradient id="kartaGoldFavicon" x1="20" y1="20" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC107" />
+      <stop offset="1" stop-color="#E59500" />
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="50" fill="url(#kartaBgFavicon)" />
+  <path
+    d="M33 32L51 50L33 68"
+    stroke="url(#kartaGoldFavicon)"
+    stroke-width="7.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M51 32L69 50L51 68"
+    stroke="url(#kartaGoldFavicon)"
+    stroke-width="7.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

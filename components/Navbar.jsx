@@ -1,6 +1,6 @@
 "use client";
-import { SignInButton, Show, UserButton, useAuth } from "@clerk/nextjs";
-import { PackageIcon, Search, ShoppingCart } from "lucide-react";
+import { SignInButton, Show, UserButton, useAuth, useUser } from "@clerk/nextjs";
+import { PackageIcon, Search, ShoppingCart, Store } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,8 @@ import KartaLogoIcon from "./KartaLogoIcon";
 
 const Navbar = () => {
   const router = useRouter();
-  const { has } = useAuth();
+  const { has, getToken } = useAuth();
+  const { user } = useUser();
   const isPlus = Boolean(has && has({ plan: "plus" }));
 
   const currency = process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || "$";
@@ -20,9 +21,30 @@ const Navbar = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
   const searchRef = useRef(null);
 
   const cartCount = useSelector((state) => state.cart.total);
+
+  useEffect(() => {
+    const checkSellerStatus = async () => {
+      if (!user) {
+        setIsSeller(false);
+        return;
+      }
+      try {
+        const token = await getToken();
+        const { data } = await axios.get("/api/store/seller", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setIsSeller(Boolean(data?.isSeller));
+      } catch (error) {
+        setIsSeller(false);
+      }
+    };
+
+    checkSellerStatus();
+  }, [user, getToken]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -209,6 +231,13 @@ const Navbar = () => {
                       label="My Orders"
                       onClick={() => router.push("/orders")}
                     />
+                    {isSeller && (
+                      <UserButton.Action
+                        labelIcon={<Store size={16} />}
+                        label="My Store"
+                        onClick={() => router.push("/store")}
+                      />
+                    )}
                   </UserButton.MenuItems>
                 </UserButton>
               </div>
@@ -244,6 +273,13 @@ const Navbar = () => {
                       label="My Orders"
                       onClick={() => router.push("/orders")}
                     />
+                    {isSeller && (
+                      <UserButton.Action
+                        labelIcon={<Store size={16} />}
+                        label="My Store"
+                        onClick={() => router.push("/store")}
+                      />
+                    )}
                   </UserButton.MenuItems>
                 </UserButton>
               </div>

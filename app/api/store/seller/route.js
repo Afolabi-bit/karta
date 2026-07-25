@@ -1,27 +1,29 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import authSeller from "@/middlewares/authsellers";
 
 export async function GET(request) {
   try {
     const { userId } = await auth();
-    if (!userId)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!userId) {
+      return NextResponse.json({ isSeller: false }, { status: 200 });
+    }
 
-    const isSeller = await authSeller(userId);
-    if (!isSeller)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const storeInfo = await prisma.store.findUnique({
+    const store = await prisma.store.findUnique({
       where: { userId },
     });
-    return NextResponse.json({ isSeller, storeInfo }, { status: 200 });
-  } catch (error) {
-    console.log(error);
+
+    const isSeller = store?.status === "approved";
+
     return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
+      { isSeller, storeInfo: isSeller ? store : null },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("Error fetching seller info:", error);
+    return NextResponse.json(
+      { isSeller: false, error: error.message },
+      { status: 200 },
     );
   }
 }

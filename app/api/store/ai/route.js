@@ -74,7 +74,24 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { base64Image, mimeType } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return NextResponse.json(
+        { error: "Image payload is too large or invalid." },
+        { status: 400 }
+      );
+    }
+
+    const { base64Image, mimeType } = body || {};
+
+    if (!base64Image || !mimeType) {
+      return NextResponse.json(
+        { error: "Image data is required." },
+        { status: 400 }
+      );
+    }
 
     const result = await main(base64Image, mimeType);
 
@@ -85,6 +102,9 @@ export async function POST(request) {
       { status: 200 },
     );
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(
+      { error: error.message || "Failed to analyze image with AI" },
+      { status: 400 }
+    );
   }
 }

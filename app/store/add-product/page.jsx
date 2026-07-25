@@ -37,55 +37,102 @@ export default function StoreAddProduct() {
     setProductInfo({ ...productInfo, [e.target.name]: e.target.value });
   };
 
+  const compressImageForAI = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement("img");
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.src = e.target?.result;
+      };
+
+      img.onload = () => {
+        const maxDim = 1024;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        const mimeType = "image/jpeg";
+        const base64Image = dataUrl.split(",")[1];
+
+        resolve({ base64Image, mimeType });
+      };
+
+      img.onerror = (err) => reject(err);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (key, file) => {
     setImages((prev) => ({ ...prev, [key]: file }));
     setAiUsed(false);
     if (key === "1" && file && !aiUsed) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = async () => {
-        const mimeType = file.type;
-        const base64Image = reader.result.split(",")[1];
-
+      try {
+        const { base64Image, mimeType } = await compressImageForAI(file);
         const token = await getToken();
-        try {
-          await toast.promise(
-            axios.post(
-              "/api/store/ai",
-              {
-                base64Image,
-                mimeType,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              },
-            ),
-            {
-              loading: "Analyzing image with AI...",
-              success: (res) => {
-                const data = res.data;
-                if (data.name && data.description) {
-                  setProductInfo((prev) => ({
-                    ...prev,
-                    name: data.name,
-                    description: data.description,
-                  }));
-                  setAiUsed(true);
 
-                  return "Image analyzed successfully";
-                }
-                return "Could not analyze image";
-              },
-              error: (err) => err.response?.data?.error || err.message,
+        await toast.promise(
+          axios.post(
+            "/api/store/ai",
+            {
+              base64Image,
+              mimeType,
             },
-          );
-        } catch (error) {
-          console.log(error);
-        }
-      };
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          ),
+          {
+            loading: "Analyzing image with AI...",
+            success: (res) => {
+              const data = res.data;
+              if (data.name && data.description) {
+                setProductInfo((prev) => ({
+                  ...prev,
+                  name: data.name,
+                  description: data.description,
+                }));
+                setAiUsed(true);
+
+                return "Image analyzed successfully";
+              }
+              return "Could not analyze image";
+            },
+            error: (err) => {
+              if (err.response?.status === 413) {
+                return "Image size is too large. Please select a smaller image.";
+              }
+              const errorMsg = err.response?.data?.error;
+              if (typeof errorMsg === "string") {
+                return errorMsg;
+              }
+              return "Failed to analyze image. Please try again.";
+            },
+          },
+        );
+      } catch (error) {
+        console.error("Error processing image for AI:", error);
+      }
     }
   };
 

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
-import Loading from "@/components/Loading";
+import TableSkeleton from "@/components/TableSkeleton";
 import { productDummyData } from "@/assets/assets";
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
@@ -69,8 +69,6 @@ export default function StoreManageProducts() {
     if (user) fetchProducts();
   }, [user]);
 
-  if (loading) return <Loading />;
-
   return (
     <>
       <h1 className="text-2xl text-slate-500 mb-5">
@@ -87,7 +85,9 @@ export default function StoreManageProducts() {
           </tr>
         </thead>
         <tbody className="text-slate-700">
-          {products.length === 0 ? (
+          {loading ? (
+            <TableSkeleton rows={5} />
+          ) : products.length === 0 ? (
             <tr>
               <td
                 colSpan="5"

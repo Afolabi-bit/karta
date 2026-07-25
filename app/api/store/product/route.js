@@ -17,18 +17,44 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const formData = await request.formData();
-    const name = formData.get("name");
-    const description = formData.get("description");
-    const price = Number(formData.get("price"));
+    const name = formData.get("name")?.toString().trim();
+    const description = formData.get("description")?.toString().trim();
     const mrp = Number(formData.get("mrp"));
+    const rawPrice = formData.get("price");
     const category = formData.get("category");
     const images = formData.getAll("images");
 
-    if (!name || !description || !price || !mrp || !category || !images)
+    if (
+      !name ||
+      !description ||
+      !mrp ||
+      isNaN(mrp) ||
+      mrp <= 0 ||
+      !category ||
+      !images ||
+      images.length === 0
+    ) {
       return NextResponse.json(
         { error: "Missing required product details" },
         { status: 400 },
       );
+    }
+
+    let price =
+      rawPrice !== null && rawPrice !== undefined && rawPrice !== ""
+        ? Number(rawPrice)
+        : mrp;
+
+    if (isNaN(price) || price <= 0) {
+      price = mrp;
+    }
+
+    if (price > mrp) {
+      return NextResponse.json(
+        { error: "Offer price cannot be greater than actual price" },
+        { status: 400 },
+      );
+    }
 
     const imagesUrl = await Promise.all(
       images.map(async (image) => {

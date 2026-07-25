@@ -24,8 +24,8 @@ export default function StoreAddProduct() {
   const [productInfo, setProductInfo] = useState({
     name: "",
     description: "",
-    mrp: 0,
-    price: 0,
+    mrp: "",
+    price: "",
     category: "",
   });
   const [loading, setLoading] = useState(false);
@@ -37,117 +37,206 @@ export default function StoreAddProduct() {
     setProductInfo({ ...productInfo, [e.target.name]: e.target.value });
   };
 
-  const handleImageUpload = async (key, file) => {
-    setImages((prev) => ({ ...prev, [key]: file }));
-    setAiUsed(false);
-    if (key === "1" && file && !aiUsed) {
+  const compressImageForAI = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement("img");
       const reader = new FileReader();
-      reader.readAsDataURL(file);
 
-      reader.onload = async () => {
-        const mimeType = file.type;
-        const base64Image = reader.result.split(",")[1];
-
-        const token = await getToken();
-        try {
-          await toast.promise(
-            axios.post(
-              "/api/store/ai",
-              {
-                base64Image,
-                mimeType,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              },
-            ),
-            {
-              loading: "Analyzing image with AI...",
-              success: (res) => {
-                const data = res.data;
-                if (data.name && data.description) {
-                  setProductInfo((prev) => ({
-                    ...prev,
-                    name: data.name,
-                    description: data.description,
-                  }));
-                  setAiUsed(true);
-
-                  return "Image analyzed successfully";
-                }
-                return "Could not analyze image";
-              },
-              error: (err) => err.response?.data?.error || err.message,
-            },
-          );
-        } catch (error) {
-          console.log(error);
-        }
+      reader.onload = (e) => {
+        img.src = e.target?.result;
       };
+
+      img.onload = () => {
+        const maxDim = 1024;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        const mimeType = "image/jpeg";
+        const base64Image = dataUrl.split(",")[1];
+
+        resolve({ base64Image, mimeType });
+      };
+
+      img.onerror = (err) => reject(err);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageUpload = async (key, file) => {
+    if (!file) return;
+    setImages((prev) => ({ ...prev, [key]: file }));
+    if (!aiUsed) {
+      try {
+        const { base64Image, mimeType } = await compressImageForAI(file);
+        const token = await getToken();
+
+        await toast.promise(
+          axios.post(
+            "/api/store/ai",
+            {
+              base64Image,
+              mimeType,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          ),
+          {
+            loading: "Analyzing image with AI...",
+            success: (res) => {
+              const data = res.data;
+              if (data.name && data.description) {
+                setProductInfo((prev) => ({
+                  ...prev,
+                  name: data.name,
+                  description: data.description,
+                }));
+                setAiUsed(true);
+
+                return "Image analyzed successfully";
+              }
+              return "Could not analyze image";
+            },
+            error: (err) => {
+              if (err.response?.status === 413) {
+                return "Image size is too large. Please select a smaller image.";
+              }
+              const errorMsg = err.response?.data?.error;
+              if (typeof errorMsg === "string") {
+                return errorMsg;
+              }
+              return "Failed to analyze image. Please try again.";
+            },
+          },
+        );
+      } catch (error) {
+        console.error("Error processing image for AI:", error);
+      }
     }
   };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    try {
-      // If no image is uploaded
-      if (!images[1] && !images[2] && !images[3] && !images[4]) {
-        return toast.error("Please upload at least one product image");
+
+    // Frontend validation
+    if (!images[1] && !images[2] && !images[3] && !images[4]) {
+      return toast.error("Please upload at least one product image");
+    }
+
+    if (!productInfo.name.trim()) {
+      return toast.error("Please enter a product name");
+    }
+
+    if (!productInfo.description.trim()) {
+      return toast.error("Please enter a product description");
+    }
+
+    const numericMrp = Number(productInfo.mrp);
+    if (!productInfo.mrp || isNaN(numericMrp) || numericMrp <= 0) {
+      return toast.error("Please enter a valid actual price greater than 0");
+    }
+
+    let numericPrice = numericMrp;
+    if (
+      productInfo.price !== "" &&
+      productInfo.price !== null &&
+      productInfo.price !== undefined
+    ) {
+      const parsedPrice = Number(productInfo.price);
+      if (isNaN(parsedPrice) || parsedPrice <= 0) {
+        return toast.error("Please enter a valid offer price");
       }
+      if (parsedPrice > numericMrp) {
+        return toast.error("Offer price cannot be greater than actual price");
+      }
+      numericPrice = parsedPrice;
+    }
 
-      setLoading(true);
+    if (!productInfo.category) {
+      return toast.error("Please select a category");
+    }
 
-      const formData = new FormData();
-      formData.append("name", productInfo.name);
-      formData.append("description", productInfo.description);
-      formData.append("mrp", productInfo.mrp);
-      formData.append("price", productInfo.price);
-      formData.append("category", productInfo.category);
+    setLoading(true);
 
-      Object.keys(images).forEach((key) => {
-        images[key] && formData.append("images", images[key]);
-      });
+    try {
+      await toast.promise(
+        (async () => {
+          const formData = new FormData();
+          formData.append("name", productInfo.name.trim());
+          formData.append("description", productInfo.description.trim());
+          formData.append("mrp", numericMrp);
+          formData.append("price", numericPrice);
+          formData.append("category", productInfo.category);
 
-      const token = await getToken();
+          Object.keys(images).forEach((key) => {
+            images[key] && formData.append("images", images[key]);
+          });
 
-      const { data } = await axios.post("/api/store/product", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+          const token = await getToken();
+
+          const { data } = await axios.post("/api/store/product", formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          setProductInfo({
+            name: "",
+            description: "",
+            mrp: "",
+            price: "",
+            category: "",
+          });
+          setImages({ 1: null, 2: null, 3: null, 4: null });
+          setAiUsed(false);
+
+          return data.message || "Product added successfully";
+        })(),
+        {
+          loading: "Adding Product...",
+          success: (msg) => msg,
+          error: (err) =>
+            err?.response?.data?.error ||
+            err?.message ||
+            "Failed to add product",
         },
-      });
-
-      toast.success(data.message);
-
-      setProductInfo({
-        name: "",
-        description: "",
-        mrp: 0,
-        price: 0,
-        category: "",
-      });
-      setImages({ 1: null, 2: null, 3: null, 4: null });
+      );
     } catch (error) {
-      toast.error(error?.response?.data?.error || error.message);
+      console.error("Error adding product:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={(e) =>
-        toast.promise(onSubmitHandler(e), { loading: "Adding Product..." })
-      }
-      className="text-slate-500 mb-28"
-    >
+    <form onSubmit={onSubmitHandler} className="text-slate-500 mb-28">
       <h1 className="text-2xl">
         Add New <span className="text-slate-800 font-medium">Products</span>
       </h1>
       <p className="mt-7">Product Images</p>
 
-      <div htmlFor="" className="flex gap-3 mt-4">
+      <div className="flex gap-3 mt-4">
         {Object.keys(images).map((key) => (
           <label key={key} htmlFor={`images${key}`}>
             <Image
@@ -165,7 +254,12 @@ export default function StoreAddProduct() {
               type="file"
               accept="image/*"
               id={`images${key}`}
-              onChange={(e) => handleImageUpload(key, e.target.files[0])}
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  handleImageUpload(key, e.target.files[0]);
+                }
+                e.target.value = "";
+              }}
               hidden
             />
           </label>
@@ -203,12 +297,13 @@ export default function StoreAddProduct() {
           Actual Price ($)
           <input
             type="number"
+            step="0.01"
+            min="0.01"
             name="mrp"
             onChange={onChangeHandler}
             value={productInfo.mrp}
             placeholder="0"
-            rows={5}
-            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded resize-none"
+            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded"
             required
           />
         </label>
@@ -216,13 +311,13 @@ export default function StoreAddProduct() {
           Offer Price ($)
           <input
             type="number"
+            step="0.01"
+            min="0"
             name="price"
             onChange={onChangeHandler}
             value={productInfo.price}
-            placeholder="0"
-            rows={5}
-            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded resize-none"
-            required
+            placeholder="0 (optional)"
+            className="w-full max-w-45 p-2 px-4 outline-none border border-slate-200 rounded"
           />
         </label>
       </div>

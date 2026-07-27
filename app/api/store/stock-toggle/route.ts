@@ -27,13 +27,16 @@ export async function POST(request: NextRequest) {
     if (!product)
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
-    await prisma.product.update({
+    const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: { inStock: !product.inStock },
     });
 
     return NextResponse.json(
-      { message: "Product stock updated successfully" },
+      {
+        message: `Product is now ${updatedProduct.inStock ? "in stock" : "out of stock"}`,
+        inStock: updatedProduct.inStock,
+      },
       { status: 200 },
     );
   } catch (error: any) {

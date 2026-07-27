@@ -48,6 +48,13 @@ export default function StoreManageProducts() {
   };
 
   const toggleStock = async (productId: string) => {
+    // Optimistically toggle inStock in local UI state
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId ? { ...p, inStock: !p.inStock } : p,
+      ),
+    );
+
     try {
       const token = await getToken();
 
@@ -61,14 +68,22 @@ export default function StoreManageProducts() {
         },
       );
 
-      setProducts((prev) =>
-        prev.map((p) =>
-          p.id === productId ? { ...p, inStock: data.inStock } : p,
-        ),
-      );
+      if (typeof data?.inStock === "boolean") {
+        setProducts((prev) =>
+          prev.map((p) =>
+            p.id === productId ? { ...p, inStock: data.inStock } : p,
+          ),
+        );
+      }
 
       toast.success(data.message || "Stock status updated");
     } catch (error: any) {
+      // Revert optimistic update on error
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === productId ? { ...p, inStock: !p.inStock } : p,
+        ),
+      );
       toast.error(
         error?.response?.data?.error || "Failed to update product stock status.",
       );
@@ -184,19 +199,16 @@ export default function StoreManageProducts() {
                       {currency}{product.price.toLocaleString()}
                     </td>
                     <td className="px-4 py-3.5 text-center">
-                      <label className="relative inline-flex items-center cursor-pointer text-gray-900 gap-3">
+                      <label className="relative inline-flex items-center justify-center cursor-pointer text-gray-900">
                         <input
                           type="checkbox"
                           className="sr-only peer"
-                          onChange={() =>
-                            toast.promise(toggleStock(product.id), {
-                              loading: "Updating stock...",
-                            })
-                          }
+                          onChange={() => toggleStock(product.id)}
                           checked={!!product.inStock}
                         />
-                        <div className="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-[#E59500] transition-colors duration-200"></div>
-                        <span className="dot absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-4"></span>
+                        <div className="relative w-9 h-5 bg-slate-300 rounded-full peer-checked:bg-[#E59500] transition-colors duration-200 peer-checked:[&>span]:translate-x-4">
+                          <span className="dot absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out"></span>
+                        </div>
                       </label>
                     </td>
                   </tr>
@@ -256,15 +268,11 @@ export default function StoreManageProducts() {
                     <input
                       type="checkbox"
                       className="sr-only peer"
-                      onChange={() =>
-                        toast.promise(toggleStock(product.id), {
-                          loading: "Updating stock...",
-                        })
-                      }
+                      onChange={() => toggleStock(product.id)}
                       checked={!!product.inStock}
                     />
-                    <div className="relative w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-[#E59500] transition-colors duration-200">
-                      <span className="dot absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-4"></span>
+                    <div className="relative w-9 h-5 bg-slate-300 rounded-full peer-checked:bg-[#E59500] transition-colors duration-200 peer-checked:[&>span]:translate-x-4">
+                      <span className="dot absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out"></span>
                     </div>
                   </label>
                 </div>

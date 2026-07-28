@@ -30,6 +30,13 @@ export default function AdminStores() {
   };
 
   const toggleIsActive = async (storeId: string) => {
+    // Optimistically update UI state
+    setStores((prev) =>
+      prev.map((s) =>
+        s.id === storeId ? { ...s, isActive: !s.isActive } : s,
+      ),
+    );
+
     try {
       const token = await getToken();
       const { data } = await axios.post(
@@ -43,9 +50,23 @@ export default function AdminStores() {
           },
         },
       );
-      toast.success(data.message);
-      await fetchStores();
+
+      if (typeof data?.isActive === "boolean") {
+        setStores((prev) =>
+          prev.map((s) =>
+            s.id === storeId ? { ...s, isActive: data.isActive } : s,
+          ),
+        );
+      }
+
+      toast.success(data.message || "Store status updated");
     } catch (error: any) {
+      // Revert optimistic update on failure
+      setStores((prev) =>
+        prev.map((s) =>
+          s.id === storeId ? { ...s, isActive: !s.isActive } : s,
+        ),
+      );
       toast.error(error.response?.data?.error || "Failed to toggle store status");
     }
   };
@@ -81,20 +102,18 @@ export default function AdminStores() {
 
               {/* Actions */}
               <div className="flex items-center gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 max-md:justify-center shrink-0">
-                <span className="text-xs font-semibold text-slate-700">Active</span>
-                <label className="relative inline-flex items-center cursor-pointer text-gray-900">
+                <span className="text-xs font-semibold text-slate-700">
+                  {store.isActive ? "Active" : "Inactive"}
+                </span>
+                <label className="relative inline-flex items-center justify-center cursor-pointer text-gray-900">
                   <input
                     type="checkbox"
                     className="sr-only peer"
-                    onChange={() =>
-                      toast.promise(toggleIsActive(store.id), {
-                        loading: "Updating status...",
-                      })
-                    }
+                    onChange={() => toggleIsActive(store.id)}
                     checked={!!store.isActive}
                   />
-                  <div className="relative w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-[#E59500] transition-colors duration-200">
-                    <span className="dot absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out peer-checked:translate-x-4"></span>
+                  <div className="relative w-9 h-5 bg-slate-300 rounded-full peer-checked:bg-[#E59500] transition-colors duration-200 peer-checked:[&>span]:translate-x-4">
+                    <span className="dot absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out"></span>
                   </div>
                 </label>
               </div>

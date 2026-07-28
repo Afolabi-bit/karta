@@ -1,6 +1,6 @@
-'use client'
-import Image from "next/image"
-import { MapPin, Mail, Phone } from "lucide-react"
+'use client';
+import Image from "next/image";
+import { MapPin, Mail, Phone, CalendarIcon } from "lucide-react";
 
 interface StoreInfoProps {
     store: any;
@@ -8,73 +8,89 @@ interface StoreInfoProps {
 
 const StoreInfo: React.FC<StoreInfoProps> = ({ store }) => {
     return (
-        <div className="flex-1 space-y-2 text-sm w-full">
-            {store.logo && (
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-100 p-1 flex items-center justify-center overflow-hidden border border-slate-200 shadow-xs max-sm:mx-auto">
+        <div className="flex-1 text-sm space-y-4 w-full">
+            {/* Header: Logo, Name, Handle, Status */}
+            <div className="flex items-start gap-3.5">
+                {store.logo ? (
                     <Image
-                        width={80}
-                        height={80}
+                        width={64}
+                        height={64}
                         src={store.logo}
                         alt={store.name}
-                        className="w-full h-full object-cover rounded-full"
-                        style={{ width: "auto", height: "auto" }}
+                        className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-full shadow-xs border border-slate-200 shrink-0"
                     />
+                ) : (
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-600 text-lg shrink-0">
+                        {store.name?.charAt(0) || "S"}
+                    </div>
+                )}
+
+                <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-800 truncate">{store.name}</h3>
+                        <span className="text-xs text-slate-400 font-medium">@{store.username}</span>
+                        <span
+                            className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full capitalize ${
+                                store.status === 'pending'
+                                    ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                    : store.status === 'rejected'
+                                    ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                                    : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            }`}
+                        >
+                            {store.status}
+                        </span>
+                    </div>
+                    <p className="text-xs text-slate-600 line-clamp-2 mt-1">{store.description}</p>
                 </div>
-            )}
-            <div className="flex flex-col sm:flex-row gap-2 items-center max-sm:text-center">
-                <h3 className="text-xl font-bold text-slate-800">{store.name}</h3>
-                <span className="text-xs text-slate-500 font-medium">@{store.username}</span>
-
-                {/* Status Badge */}
-                <span
-                    className={`text-xs font-semibold px-3 py-0.5 rounded-full capitalize ${
-                        store.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : store.status === 'rejected'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-green-100 text-green-800'
-                    }`}
-                >
-                    {store.status}
-                </span>
             </div>
 
-            <p className="text-slate-600 my-3 text-xs sm:text-sm max-w-2xl leading-relaxed">{store.description}</p>
-
-            <div className="space-y-1.5 text-xs sm:text-sm text-slate-600">
-                <p className="flex items-center gap-2 max-sm:justify-center"><MapPin size={15} className="shrink-0 text-slate-400" /> <span>{store.address}</span></p>
-                <p className="flex items-center gap-2 max-sm:justify-center"><Phone size={15} className="shrink-0 text-slate-400" /> <span>{store.contact}</span></p>
-                <p className="flex items-center gap-2 max-sm:justify-center"><Mail size={15} className="shrink-0 text-slate-400" /> <span>{store.email}</span></p>
+            {/* Contact & Location Info */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 py-2 border-y border-slate-100 text-xs text-slate-600">
+                <p className="flex items-center gap-2 truncate">
+                    <MapPin size={14} className="shrink-0 text-[#E59500]" />
+                    <span className="truncate">{store.address || "N/A"}</span>
+                </p>
+                <p className="flex items-center gap-2 truncate">
+                    <Phone size={14} className="shrink-0 text-[#E59500]" />
+                    <span className="truncate">{store.contact || "N/A"}</span>
+                </p>
+                <p className="flex items-center gap-2 truncate">
+                    <Mail size={14} className="shrink-0 text-[#E59500]" />
+                    <span className="truncate">{store.email || "N/A"}</span>
+                </p>
             </div>
 
-            <p className="text-slate-500 text-xs mt-4 max-sm:text-center">
-                Applied on <span className="font-medium">{new Date(store.createdAt).toLocaleDateString()}</span> by
-            </p>
-
+            {/* Applicant User Info */}
             {store.user && (
-                <div className="flex items-center gap-2.5 text-xs pt-1 max-sm:justify-center">
-                    {store.user.image ? (
-                        <Image
-                            width={36}
-                            height={36}
-                            src={store.user.image}
-                            alt={store.user.name}
-                            className="w-8 h-8 rounded-full object-cover shrink-0"
-                            style={{ width: "auto", height: "auto" }}
-                        />
-                    ) : (
-                        <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold shrink-0">
-                            {store.user.name?.charAt(0) || "U"}
+                <div className="flex items-center justify-between gap-3 bg-slate-50 p-2.5 px-3.5 rounded-lg border border-slate-100 text-xs">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        {store.user.image ? (
+                            <Image
+                                width={32}
+                                height={32}
+                                src={store.user.image}
+                                alt={store.user.name || "User"}
+                                className="w-8 h-8 rounded-full object-cover shrink-0 border border-slate-200"
+                            />
+                        ) : (
+                            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold text-xs shrink-0">
+                                {store.user.name?.charAt(0) || "U"}
+                            </div>
+                        )}
+                        <div className="min-w-0">
+                            <p className="text-slate-800 font-semibold truncate">{store.user.name}</p>
+                            <p className="text-slate-400 text-[11px] truncate">{store.user.email}</p>
                         </div>
-                    )}
-                    <div>
-                        <p className="text-slate-800 font-semibold">{store.user.name}</p>
-                        <p className="text-slate-400 text-[11px]">{store.user.email}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] text-slate-400 shrink-0">
+                        <CalendarIcon size={12} />
+                        <span>{new Date(store.createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
 
-export default StoreInfo
+export default StoreInfo;

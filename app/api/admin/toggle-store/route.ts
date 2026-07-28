@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "store updated (toggled) successfully",
+      message: `Store is now ${updatedStore.isActive ? "active" : "inactive"}`,
+      isActive: updatedStore.isActive,
     });
   } catch (error: any) {
     console.log(error);

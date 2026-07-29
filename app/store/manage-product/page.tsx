@@ -8,6 +8,8 @@ import axios from "axios";
 import { ProductWithDetails } from "@/types";
 import Link from "next/link";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export default function StoreManageProducts() {
   const { getToken } = useAuth();
   const { user } = useUser();
@@ -39,8 +41,10 @@ export default function StoreManageProducts() {
       console.error("Error fetching products:", error);
       setHasError(true);
       toast.error(
-        error?.response?.data?.error ||
+        getCleanErrorMessage(
+          error,
           "Unable to load store products. Please try again later.",
+        ),
       );
     } finally {
       setLoading(false);
@@ -85,7 +89,10 @@ export default function StoreManageProducts() {
         ),
       );
       toast.error(
-        error?.response?.data?.error || "Failed to update product stock status.",
+        getCleanErrorMessage(
+          error,
+          "Failed to update product stock status.",
+        ),
       );
     }
   };

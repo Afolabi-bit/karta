@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import authSeller from "@/middlewares/authsellers";
@@ -102,9 +103,7 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to analyze image with AI" },
-      { status: 400 }
-    );
+    return formatApiError(error, "Failed to analyze image with AI");
   }
 }
+

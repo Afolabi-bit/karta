@@ -12,6 +12,8 @@ import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export default function AdminDashboard() {
   const { getToken } = useAuth();
 
@@ -76,7 +78,7 @@ export default function AdminDashboard() {
     } catch (error: any) {
       console.error("Error loading admin dashboard:", error);
       setHasError(true);
-      toast.error(error.response?.data?.error || "Unable to load admin metrics");
+      toast.error(getCleanErrorMessage(error, "Unable to load admin metrics"));
     } finally {
       setLoading(false);
     }

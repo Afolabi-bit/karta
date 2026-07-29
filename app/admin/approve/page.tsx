@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { useUser, useAuth } from "@clerk/nextjs";
 import axios from "axios";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export default function AdminApprove() {
   const { user } = useUser();
   const { getToken } = useAuth();
@@ -25,7 +27,7 @@ export default function AdminApprove() {
       setStores(data.stores || []);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.error || "Failed to load pending store applications");
+      toast.error(getCleanErrorMessage(error, "Failed to load pending store applications"));
     } finally {
       setLoading(false);
     }
@@ -50,7 +52,7 @@ export default function AdminApprove() {
       await fetchStores();
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.error || "Failed to update store application");
+      toast.error(getCleanErrorMessage(error, "Failed to update store application"));
     }
   };
 

@@ -10,6 +10,8 @@ import axios from "axios";
 import { clearCart } from "@/lib/features/cart/cartSlice";
 import { Address, Coupon } from "@/types";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 interface OrderSummaryProps {
   totalPrice: number;
   items: any[];
@@ -54,9 +56,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ totalPrice, items }) => {
       setCoupon(data.coupon);
       toast.success("Coupon applied successfully");
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.error || error.message || "Failed to apply coupon",
-      );
+      toast.error(getCleanErrorMessage(error, "Failed to apply coupon"));
     }
   };
 
@@ -96,9 +96,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ totalPrice, items }) => {
         dispatch(clearCart());
       }
     } catch (error: any) {
-      toast.error(
-        error?.response?.data?.error || error.message || "Failed to place order",
-      );
+      toast.error(getCleanErrorMessage(error, "Failed to place order"));
     }
   };
 

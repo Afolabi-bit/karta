@@ -7,6 +7,7 @@ import axios from "axios";
 
 import { useAppDispatch } from "@/lib/store";
 import { addAddress } from "@/lib/features/address/addressSlice";
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
 
 interface AddressModalProps {
   setShowAddressModal: (show: boolean) => void;
@@ -48,12 +49,13 @@ const AddressModal: React.FC<AddressModalProps> = ({ setShowAddressModal }) => {
           },
         },
       );
+
       dispatch(addAddress(data.newAddress));
       toast.success(data.message);
       setShowAddressModal(false);
     } catch (error: any) {
       console.log(error);
-      toast.error(error.message);
+      toast.error(getCleanErrorMessage(error, "Failed to add address"));
     }
   };
 

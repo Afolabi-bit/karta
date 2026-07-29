@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import prisma from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -28,14 +29,11 @@ export async function GET(request: NextRequest) {
       },
     });
     if (!store)
-      return NextResponse.json({ error: "Store not found" }, { status: 400 });
+      return NextResponse.json({ error: "Store not found" }, { status: 404 });
 
     return NextResponse.json(store, { status: 200 });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to fetch store details");
   }
 }
+

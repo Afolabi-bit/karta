@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "@/lib/store";
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
 
 let debounceTimer: any = null;
 
@@ -33,7 +34,7 @@ export const uploadCart = createAsyncThunk<
       );
     }, 1000);
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data);
+    return thunkAPI.rejectWithValue(getCleanErrorMessage(error, "Failed to upload cart"));
   }
 });
 
@@ -50,9 +51,10 @@ export const fetchCart = createAsyncThunk<
     });
     return data;
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data);
+    return thunkAPI.rejectWithValue(getCleanErrorMessage(error, "Failed to fetch cart"));
   }
 });
+
 
 const cartSlice = createSlice({
   name: "cart",

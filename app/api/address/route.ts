@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import prisma from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -23,11 +24,7 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
   } catch (error: any) {
-    console.error("Error updating cart:", error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to add address");
   }
 }
 
@@ -47,10 +44,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ addresses }, { status: 200 });
   } catch (error: any) {
-    console.error("Error updating cart:", error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to fetch addresses");
   }
 }
+

@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import authSeller from "../../../../middlewares/authsellers";
 import prisma from "@/lib/db";
@@ -43,10 +44,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, dashboardData }, { status: 200 });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to fetch store dashboard data");
   }
 }
+

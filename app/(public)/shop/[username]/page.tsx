@@ -9,6 +9,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { ProductWithDetails, Store } from "@/types";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export default function StoreShop() {
   const { username } = useParams();
   const [products, setProducts] = useState<ProductWithDetails[]>([]);
@@ -24,12 +26,7 @@ export default function StoreShop() {
       setProducts(data.Product || []);
     } catch (error: any) {
       console.error(error);
-      toast.error(
-        error?.response?.data?.error ||
-          error?.response?.data?.message ||
-          error.message ||
-          "Failed to fetch store data",
-      );
+      toast.error(getCleanErrorMessage(error, "Failed to fetch store data"));
     } finally {
       setLoading(false);
     }

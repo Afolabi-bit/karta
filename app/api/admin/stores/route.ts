@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import authAdmin from "../../../../middlewares/authAdmin";
@@ -9,13 +10,13 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: "not logged in" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const isAdmin = await authAdmin(userId);
 
     if (!isAdmin) {
-      return NextResponse.json({ error: "not authorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const stores = await prisma.store.findMany({
@@ -32,10 +33,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ stores });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to fetch stores");
   }
 }
+

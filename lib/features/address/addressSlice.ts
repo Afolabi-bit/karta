@@ -10,6 +10,8 @@ const initialState: AddressState = {
   list: [],
 };
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export const fetchAddress = createAsyncThunk<
   Address[],
   { getToken: () => Promise<string | null> }
@@ -23,7 +25,7 @@ export const fetchAddress = createAsyncThunk<
     });
     return data ? data.addresses : [];
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response?.data);
+    return thunkAPI.rejectWithValue(getCleanErrorMessage(error, "Failed to fetch address"));
   }
 });
 

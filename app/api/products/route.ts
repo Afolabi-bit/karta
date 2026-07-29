@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
@@ -33,10 +34,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ products }, { status: 200 });
   } catch (error) {
-    console.log(error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    return formatApiError(error, "Failed to fetch products", 500);
   }
 }
+

@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export default function AdminStores() {
   const { user } = useUser();
   const { getToken } = useAuth();
@@ -23,7 +25,7 @@ export default function AdminStores() {
       });
       setStores(data.stores || []);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to load stores");
+      toast.error(getCleanErrorMessage(error, "Failed to load stores"));
     } finally {
       setLoading(false);
     }
@@ -67,7 +69,7 @@ export default function AdminStores() {
           s.id === storeId ? { ...s, isActive: !s.isActive } : s,
         ),
       );
-      toast.error(error.response?.data?.error || "Failed to toggle store status");
+      toast.error(getCleanErrorMessage(error, "Failed to toggle store status"));
     }
   };
 

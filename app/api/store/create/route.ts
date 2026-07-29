@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
@@ -206,10 +207,7 @@ export async function GET(request: NextRequest) {
       status: "not registered",
     });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to check store status");
   }
 }
+

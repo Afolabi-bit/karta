@@ -12,6 +12,8 @@ const initialState: ProductState = {
   loading: true,
 };
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export const fetchProducts = createAsyncThunk<
   ProductWithDetails[],
   { storeId?: string }
@@ -23,7 +25,7 @@ export const fetchProducts = createAsyncThunk<
     return data.products;
   } catch (error: any) {
     console.log(error);
-    return thunkAPI.rejectWithValue(error.response?.data);
+    return thunkAPI.rejectWithValue(getCleanErrorMessage(error, "Failed to fetch products"));
   }
 });
 

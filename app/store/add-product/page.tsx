@@ -5,6 +5,7 @@ import axios from "axios";
 import Image from "next/image";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
 
 export default function StoreAddProduct() {
   const categories = [
@@ -160,7 +161,7 @@ export default function StoreAddProduct() {
       setImages({ 1: null, 2: null, 3: null, 4: null });
       setAiUsed(false);
     } catch (error: any) {
-      toast.error(error.response?.data?.error || error.message);
+      toast.error(getCleanErrorMessage(error, "Failed to add product"));
     } finally {
       setLoading(false);
     }

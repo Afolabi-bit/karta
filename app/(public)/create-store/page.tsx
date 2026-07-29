@@ -7,6 +7,8 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export default function CreateStore() {
   const { user } = useUser();
   const router = useRouter();
@@ -75,9 +77,10 @@ export default function CreateStore() {
       }
     } catch (error: any) {
       toast.error(
-        error?.response?.data?.error ||
-          error?.message ||
+        getCleanErrorMessage(
+          error,
           "Error while fetching your store status.",
+        ),
       );
     }
 
@@ -116,9 +119,10 @@ export default function CreateStore() {
       );
     } catch (error: any) {
       toast.error(
-        error?.response?.data?.error ||
-          error?.message ||
+        getCleanErrorMessage(
+          error,
           "Failed to submit store application",
+        ),
       );
     }
   };

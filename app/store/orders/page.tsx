@@ -5,6 +5,8 @@ import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export default function StoreOrders() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +24,7 @@ export default function StoreOrders() {
       setOrders(data.orders || []);
     } catch (error: any) {
       console.error("Error fetching orders:", error);
-      toast.error(error?.response?.data?.error || "Unable to load store orders");
+      toast.error(getCleanErrorMessage(error, "Unable to load store orders"));
     } finally {
       setLoading(false);
     }
@@ -48,7 +50,7 @@ export default function StoreOrders() {
       );
       toast.success("Order status updated successfully");
     } catch (error: any) {
-      toast.error(error?.response?.data?.error || "Failed to update order status");
+      toast.error(getCleanErrorMessage(error, "Failed to update order status"));
     }
   };
 

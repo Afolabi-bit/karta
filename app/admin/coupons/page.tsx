@@ -7,6 +7,8 @@ import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import { Coupon } from "@/types";
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 const safeFormatDate = (dateVal: any) => {
   if (!dateVal) return "";
   const parsed = new Date(dateVal);
@@ -40,7 +42,7 @@ export default function AdminCoupons() {
       setCoupons(data.coupons || []);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.error || "Failed to load coupons");
+      toast.error(getCleanErrorMessage(error, "Failed to load coupons"));
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ export default function AdminCoupons() {
       });
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.error || "Failed to add coupon");
+      toast.error(getCleanErrorMessage(error, "Failed to add coupon"));
     }
   };
 
@@ -108,7 +110,7 @@ export default function AdminCoupons() {
       toast.success(data.message);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.error || "Failed to delete coupon");
+      toast.error(getCleanErrorMessage(error, "Failed to delete coupon"));
     }
   };
 

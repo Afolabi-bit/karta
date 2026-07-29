@@ -10,6 +10,8 @@ const initialState: RatingState = {
   ratings: [],
 };
 
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
+
 export const fetchUserRatings = createAsyncThunk<
   RatingWithUser[],
   { getToken: () => Promise<string | null> }
@@ -22,7 +24,7 @@ export const fetchUserRatings = createAsyncThunk<
     return data;
   } catch (error: any) {
     console.error(error);
-    return thunkAPI.rejectWithValue(error.response?.data);
+    return thunkAPI.rejectWithValue(getCleanErrorMessage(error, "Failed to fetch user ratings"));
   }
 });
 

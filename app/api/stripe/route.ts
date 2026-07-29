@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import prisma from "@/lib/db";
@@ -19,11 +20,7 @@ export async function POST(request: NextRequest) {
           process.env.STRIPE_WEBHOOK_SECRET
         );
       } catch (err: any) {
-        console.error("Webhook signature verification failed:", err.message);
-        return NextResponse.json(
-          { error: `Webhook Error: ${err.message}` },
-          { status: 400 }
-        );
+        return formatApiError(err, "Webhook signature verification failed");
       }
     } else {
       event = JSON.parse(rawBody);
@@ -94,10 +91,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error: any) {
-    console.error("Error processing Stripe webhook:", error);
-    return NextResponse.json(
-      { error: error.message || "Webhook handler error" },
-      { status: 400 }
-    );
+    return formatApiError(error, "Error processing webhook");
   }
 }
+

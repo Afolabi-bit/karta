@@ -8,6 +8,7 @@ import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import { useAppDispatch } from "@/lib/store";
 import { addRating } from "@/lib/features/rating/ratingSlice";
+import { getCleanErrorMessage } from "@/lib/getCleanErrorMessage";
 
 interface RatingModalProps {
   ratingModal: { orderId: string; productId: string } | null;
@@ -41,14 +42,13 @@ const RatingModal: React.FC<RatingModalProps> = ({ ratingModal, setRatingModal }
         },
         { headers: { Authorization: `Bearer ${token}` } },
       );
+
       dispatch(addRating(data.rating));
       toast.success(data.message);
       setRatingModal(null);
     } catch (error: any) {
       console.error("Error adding rating:", error);
-      toast.error(
-        error.response?.data?.error || error.message || "Failed to add rating",
-      );
+      toast.error(getCleanErrorMessage(error, "Failed to add rating"));
     }
   };
 

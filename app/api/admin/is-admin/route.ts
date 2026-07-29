@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import authAdmin from "@/middlewares/authAdmin";
@@ -9,15 +10,12 @@ export async function GET(request: NextRequest) {
     const isAdmin = await authAdmin(userId);
 
     if (!isAdmin) {
-      return NextResponse.json({ error: "not authorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     return NextResponse.json({ isAdmin });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to verify admin status");
   }
 }
+

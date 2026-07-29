@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
@@ -21,10 +22,7 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error: any) {
-    console.error("Error fetching seller info:", error);
-    return NextResponse.json(
-      { isSeller: false, error: error.message },
-      { status: 200 },
-    );
+    return formatApiError(error, "Failed to verify seller status");
   }
 }
+

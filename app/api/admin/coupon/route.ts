@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
@@ -8,12 +9,12 @@ export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "not logged in" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const isAdmin = await authAdmin(userId);
     if (!isAdmin) {
-      return NextResponse.json({ error: "not authorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { coupon } = await request.json();
@@ -29,11 +30,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: "Coupon added successfully" });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to add coupon");
   }
 }
 
@@ -42,12 +39,12 @@ export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "not logged in" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const isAdmin = await authAdmin(userId);
     if (!isAdmin) {
-      return NextResponse.json({ error: "not authorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const coupons = await prisma.coupon.findMany({
@@ -58,11 +55,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ coupons });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to fetch coupons");
   }
 }
 
@@ -71,12 +64,12 @@ export async function DELETE(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "not logged in" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const isAdmin = await authAdmin(userId);
     if (!isAdmin) {
-      return NextResponse.json({ error: "not authorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = request.nextUrl;
@@ -92,12 +85,9 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ message: "Coupon deleted sucessfully" });
+    return NextResponse.json({ message: "Coupon deleted successfully" });
   } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to delete coupon");
   }
 }
+

@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
@@ -187,11 +188,7 @@ export async function POST(request: NextRequest) {
       orders: createdOrderIds,
     });
   } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.code || error.message },
-      { status: 400 },
-    );
+    return formatApiError(error, "Failed to place order");
   }
 }
 
@@ -223,11 +220,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ orders });
   } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 },
-    );
+    return formatApiError(error, "Failed to fetch orders", 500);
   }
 }
+
 

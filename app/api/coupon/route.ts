@@ -1,3 +1,4 @@
+import { formatApiError } from "@/lib/apiError";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
@@ -53,11 +54,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, coupon });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
+    return formatApiError(error, "Failed to process coupon");
   }
 }
 
@@ -104,10 +101,8 @@ export async function GET(request: NextRequest) {
       coupon: activeNewUserCoupon,
     });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { showBanner: false, coupon: null },
-      { status: 500 },
-    );
+    console.error("Error fetching coupon:", error);
+    return NextResponse.json({ showBanner: false, coupon: null });
   }
 }
+

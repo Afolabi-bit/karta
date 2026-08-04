@@ -76,36 +76,93 @@ const Footer = () => {
             </span>
           </Link>
           <p className="text-sm text-slate-400 leading-relaxed">
-            Your one-stop destination for quality gadgets and everyday essentials.
+            Your one-stop destination for quality gadgets and everyday
+            essentials.
           </p>
         </div>
 
         <div>
-          <h4 className="text-white font-semibold text-base mb-4">Quick Links</h4>
+          <h4 className="text-white font-semibold text-base mb-4">
+            Quick Links
+          </h4>
           <ul className="space-y-2 text-sm">
-            <li><Link href="/" className="hover:text-[#E59500] transition">Home</Link></li>
-            <li><Link href="/shop" className="hover:text-[#E59500] transition">Shop</Link></li>
-            <li><Link href="/cart" className="hover:text-[#E59500] transition">Cart</Link></li>
-            <li><Link href="/orders" className="hover:text-[#E59500] transition">My Orders</Link></li>
+            <li>
+              <Link href="/" className="hover:text-[#E59500] transition">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link href="/shop" className="hover:text-[#E59500] transition">
+                Shop
+              </Link>
+            </li>
+            <li>
+              <Link href="/cart" className="hover:text-[#E59500] transition">
+                Cart
+              </Link>
+            </li>
+            <li>
+              <Link href="/orders" className="hover:text-[#E59500] transition">
+                My Orders
+              </Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-white font-semibold text-base mb-4">Categories</h4>
+          <h4 className="text-white font-semibold text-base mb-4">
+            Categories
+          </h4>
           <ul className="space-y-2 text-sm">
-            <li><Link href="/shop?category=Headphones" className="hover:text-[#E59500] transition">Headphones</Link></li>
-            <li><Link href="/shop?category=Speakers" className="hover:text-[#E59500] transition">Speakers</Link></li>
-            <li><Link href="/shop?category=Watch" className="hover:text-[#E59500] transition">Watches</Link></li>
-            <li><Link href="/shop?category=Earbuds" className="hover:text-[#E59500] transition">Earbuds</Link></li>
+            <li>
+              <Link
+                href="/shop?category=Headphones"
+                className="hover:text-[#E59500] transition"
+              >
+                Headphones
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/shop?category=Speakers"
+                className="hover:text-[#E59500] transition"
+              >
+                Speakers
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/shop?category=Watch"
+                className="hover:text-[#E59500] transition"
+              >
+                Watches
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/shop?category=Earbuds"
+                className="hover:text-[#E59500] transition"
+              >
+                Earbuds
+              </Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-white font-semibold text-base mb-4">Contact Us</h4>
+          <h4 className="text-white font-semibold text-base mb-4">
+            Contact Us
+          </h4>
           <ul className="space-y-3 text-sm text-slate-400">
-            <li className="flex items-center gap-2.5"><MailIcon /> support@karta.com</li>
-            <li className="flex items-center gap-2.5"><PhoneIcon /> +1 (800) 123-4567</li>
-            <li className="flex items-center gap-2.5"><MapPinIcon /> 123 Commerce St, New York, NY</li>
+            <li className="flex items-center gap-2.5">
+              <MailIcon /> afolabijoseph1122@gmail.com
+            </li>
+            <li className="flex items-center gap-2.5">
+              <PhoneIcon /> +234-8109208445
+            </li>
+            <li className="flex items-center gap-2.5">
+              <MapPinIcon /> 123 Commerce St, Lekki, Lagos
+            </li>
           </ul>
         </div>
       </div>
@@ -113,8 +170,12 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 mt-12 pt-6 border-t border-[#00355C] text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-4">
         <p>© {new Date().getFullYear()} Karta Inc. All rights reserved.</p>
         <div className="flex gap-6">
-          <Link href="#" className="hover:text-slate-300">Privacy Policy</Link>
-          <Link href="#" className="hover:text-slate-300">Terms of Service</Link>
+          <Link href="#" className="hover:text-slate-300">
+            Privacy Policy
+          </Link>
+          <Link href="#" className="hover:text-slate-300">
+            Terms of Service
+          </Link>
         </div>
       </div>
     </footer>
